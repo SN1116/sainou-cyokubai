@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サイヌ直売所 - お客様の声・ご意見板</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Hiragino Sans', 'Meiryo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+        }
+        .hero-pattern {
+            background-color: #15803d;
+            background-image: radial-gradient(#22c55e 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-opacity: 0.15;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 flex flex-col min-h-screen font-sans">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- ロゴ -->
+                <div class="flex items-center space-x-3">
+                    <span class="bg-brand-600 text-white p-2.5 rounded-2xl shadow-sm text-xl flex items-center justify-center w-10 h-10">
+                        <i class="fa-solid fa-leaf"></i>
+                    </span>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-stone-900 block leading-tight">サイヌ直売所</span>
+                        <span class="text-xs text-brand-700 font-medium">新鮮・安全・みんなの広場</span>
+                    </div>
+                </div>
+
+                <!-- ユーザーコントロール (ログイン / プロフィール) -->
+                <div class="flex items-center space-x-3">
+                    <button id="guideBtn" class="text-xs sm:text-sm text-stone-600 hover:text-brand-700 px-3 py-1.5 rounded-lg border border-stone-300 hover:border-brand-500 transition-colors flex items-center space-x-1">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span class="hidden sm:inline">セットアップ</span>ガイド
+                    </button>
+                    
+                    <div id="authContainer">
+                        <!-- 未ログイン時 -->
+                        <button id="loginBtn" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-sm hover:shadow flex items-center space-x-2">
+                            <i class="fa-brands fa-google"></i>
+                            <span>Googleでログイン</span>
+                        </button>
+
+                        <!-- ログイン時 (動的に書き換え) -->
+                        <div id="userInfo" class="hidden flex items-center space-x-3">
+                            <img id="userAvatar" src="" alt="ユーザーアイコン" class="w-9 h-9 rounded-full border-2 border-brand-500 object-cover">
+                            <div class="hidden md:block text-left">
+                                <div id="userName" class="text-xs font-bold text-stone-800"></div>
+                                <div class="text-[10px] text-stone-500">ログイン中</div>
+                            </div>
+                            <button id="logoutBtn" title="ログアウト" class="text-stone-400 hover:text-red-600 p-2 rounded-lg hover:bg-stone-100 transition-colors">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ヒーローセクション -->
+    <section class="gradient-bg hero-pattern text-white py-12 px-4 sm:px-6 lg:px-8 shadow-inner">
+        <div class="max-w-4xl mx-auto text-center space-y-4">
+            <span class="inline-block bg-white/20 text-brand-100 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
+                🌱 地元農家のおいしさをお届け
+            </span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                サイヌ直売所 <span class="text-amber-300">お客様の声掲示板</span>
+            </h1>
+            <p class="text-stone-100 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+                「こんな野菜が欲しい」「今日のトマトがすごく甘かった！」など、みなさまの率直なご意見やご感想をお聞かせください。直売所の品質向上に活かしてまいります。
+            </p>
+        </div>
+    </section>
+
+    <!-- 本日の入荷おすすめカード -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 z-10 relative">
+        <div class="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-stone-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex items-center space-x-3 p-3 rounded-xl bg-stone-50">
+                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-apple-whole"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-stone-800 text-sm">朝採れ完熟トマト</h3>
+                    <p class="text-xs text-stone-500">甘みと酸味のバランスが抜群！本日入荷済み</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 p-3 rounded-xl bg-stone-50">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-carrot"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-stone-800 text-sm">有機栽培の根菜セット</h3>
+                    <p class="text-xs text-stone-500">無農薬で安心。煮物やお味噌汁に最適です</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 p-3 rounded-xl bg-stone-50">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-stone-800 text-sm">営業時間のご案内</h3>
+                    <p class="text-xs text-stone-500">9:00 〜 17:00（水曜定休）駐車場20台完備</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-brand-600"></i>
+                    <span>みんなの投稿・ご意見</span>
+                </h2>
+                <p class="text-xs text-stone-500 mt-1">投稿するにはGoogleアカウントでのログインが必要です</p>
+            </div>
+
+            <!-- 新規投稿ボタン -->
+            <button id="openPostModalBtn" class="bg-accent-500 hover:bg-accent-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>ご意見・ご感想を投稿する</span>
+            </button>
+        </div>
+
+        <!-- フィルタータブ -->
+        <div class="flex space-x-2 border-b border-stone-200 pb-2 mb-6 overflow-x-auto">
+            <button class="filter-tab active px-4 py-2 text-sm font-semibold rounded-lg bg-brand-600 text-white" data-category="ALL">
+                すべて
+            </button>
+            <button class="filter-tab px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100" data-category="感想・応援">
+                💬 感想・応援
+            </button>
+            <button class="filter-tab px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100" data-category="商品リクエスト">
+                🥬 入荷リクエスト
+            </button>
+            <button class="filter-tab px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100" data-category="改善要望">
+                💡 サービス改善要望
+            </button>
+            <button class="filter-tab px-4 py-2 text-sm font-medium rounded-lg text-stone-600 hover:bg-stone-100" data-category="その他">
+                📌 その他
+            </button>
+        </div>
+
+        <!-- 投稿一覧エリア -->
+        <div id="feedbackList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- ローディング表示 -->
+            <div class="col-span-full text-center py-12 text-stone-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-brand-600"></i>
+                <p class="text-sm">ご意見データを読み込み中...</p>
+            </div>
+        </div>
+
+        <!-- 投稿がない場合のメッセージ -->
+        <div id="emptyMessage" class="hidden col-span-full bg-white rounded-2xl p-12 text-center border border-dashed border-stone-300">
+            <i class="fa-regular fa-comment-dots text-4xl text-stone-300 mb-3"></i>
+            <h3 class="font-bold text-stone-700">まだ投稿がありません</h3>
+            <p class="text-xs text-stone-500 mt-1">最初の投稿者になって直売所に声を届けましょう！</p>
+        </div>
+    </main>
+
+    <!-- 投稿モーダル -->
+    <div id="postModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative transform transition-all">
+            <!-- 閉じるボタン -->
+            <button id="closePostModalBtn" class="absolute top-4 right-4 text-stone-400 hover:text-stone-600 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-100">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-stone-900 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-comment-medical text-brand-600"></i>
+                <span>ご意見・ご感想の投稿</span>
+            </h3>
+
+            <!-- 未ログイン警告 -->
+            <div id="modalAuthNotice" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <p class="text-xs text-amber-800 font-medium">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                    投稿するにはGoogleログインが必要です。下のボタンからログインしてください。
+                </p>
+                <button id="modalLoginBtn" class="mt-3 w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-xl text-xs transition-colors flex items-center justify-center space-x-2">
+                    <i class="fa-brands fa-google"></i>
+                    <span>Googleでログインして続ける</span>
+                </button>
+            </div>
+
+            <form id="feedbackForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">カテゴリー <span class="text-red-500">*</span></label>
+                    <select id="formCategory" required class="w-full bg-stone-50 border border-stone-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="感想・応援">💬 感想・応援メッセージ</option>
+                        <option value="商品リクエスト">🥬 入荷リクエスト（ほしい野菜など）</option>
+                        <option value="改善要望">💡 サービス改善の要望</option>
+                        <option value="その他">📌 その他</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">満足度評価</label>
+                    <div class="flex items-center space-x-2" id="starRating">
+                        <button type="button" class="star-btn text-amber-400 text-xl" data-rating="1"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" class="star-btn text-amber-400 text-xl" data-rating="2"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" class="star-btn text-amber-400 text-xl" data-rating="3"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" class="star-btn text-amber-400 text-xl" data-rating="4"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" class="star-btn text-amber-400 text-xl" data-rating="5"><i class="fa-solid fa-star"></i></button>
+                        <span id="ratingValueText" class="text-xs text-stone-500 font-bold ml-2">5.0</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">ご意見・内容 <span class="text-red-500">*</span></label>
+                    <textarea id="formContent" rows="4" required placeholder="例：今日買ったイチゴがとても甘くて美味しかったです！今度はブロッコリーの入荷を増やしていただけると嬉しいです。" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="formAnonymous" class="rounded text-brand-600 focus:ring-brand-500 h-4 w-4">
+                    <label for="formAnonymous" class="text-xs text-stone-600">名前を伏せて「匿名」で投稿する</label>
+                </div>
+
+                <div class="pt-2 flex space-x-3">
+                    <button type="button" id="cancelPostModalBtn" class="w-1/3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium py-2.5 rounded-xl text-sm transition-colors">
+                        キャンセル
+                    </button>
+                    <button type="submit" id="submitPostBtn" class="w-2/3 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-colors flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>送信する</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GitHub Pages / Firebase セットアップガイド モーダル -->
+    <div id="guideModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="closeGuideModalBtn" class="absolute top-4 right-4 text-stone-400 hover:text-stone-600 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-100">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-stone-900 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-rocket text-brand-600"></i>
+                <span>GitHub Pages 設置手順ガイド</span>
+            </h3>
+
+            <div class="space-y-4 text-sm text-stone-700">
+                <div class="border-l-4 border-brand-500 pl-3 py-1 bg-brand-50 rounded-r-lg">
+                    <p class="font-bold text-brand-900">このサイトは GitHub Pages で即時公開可能です！</p>
+                    <p class="text-xs text-brand-700 mt-0.5">以下のステップで設定を行ってください。</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start space-x-3">
+                        <span class="bg-stone-200 text-stone-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                        <div>
+                            <p class="font-bold">GitHub にリポジトリを作成し `index.html` として保存</p>
+                            <p class="text-xs text-stone-500">このコード全体を `index.html` という名前で保存して GitHub リポジトリにプッシュします。</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <span class="bg-stone-200 text-stone-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                        <div>
+                            <p class="font-bold">Firebase Console で「Google ログイン」を有効化</p>
+                            <p class="text-xs text-stone-500">Firebase Console ＞ Authentication ＞ Sign-in method ＞ 「Google」を有効化します。</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <span class="bg-stone-200 text-stone-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+                        <div>
+                            <p class="font-bold">Firebase に GitHub Pages のドメインを許可追加</p>
+                            <p class="text-xs text-stone-500">
+                                Authentication ＞ 設定 ＞ 「承認済みドメイン (Authorized domains)」 に GitHub Pages の URL（例: <code class="bg-stone-100 px-1 rounded">username.github.io</code>）を追加してください。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <span class="bg-stone-200 text-stone-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+                        <div>
+                            <p class="font-bold">Firestore のデータベースルールを適用</p>
+                            <p class="text-xs text-stone-500">Firestore ＞ ルール で <code class="bg-stone-100 px-1 rounded">feedbacks</code> コレクションへの書き込み権限を有効化します。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-stone-200 text-right">
+                    <button id="confirmGuideBtn" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-5 py-2 rounded-xl text-sm transition-colors">
+                        理解しました
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="bg-stone-900 text-stone-400 py-8 border-t border-stone-800 text-xs">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-3">
+            <div class="flex justify-center space-x-4">
+                <span class="text-stone-300 font-bold">サイヌ直売所</span>
+                <span>|</span>
+                <span>〒000-0000 地域産直広場1-2-3</span>
+                <span>|</span>
+                <span>TEL: 00-0000-0000</span>
+            </div>
+            <p>© 2026 Sainu Cyokubai. Powered by Firebase & GitHub Pages.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Modular ESM v11.6.1) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            doc, 
+            updateDoc, 
+            increment,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-XKHdy3agr-22RmTN2aD68-ngJW6vj-8",
+            authDomain: "sainu-cyokubai.firebaseapp.com",
+            projectId: "sainu-cyokubai",
+            storageBucket: "sainu-cyokubai.firebasestorage.app",
+            messagingSenderId: "582507633549",
+            appId: "1:582507633549:web:e28921bb910bfcad9e3bc4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // State Management
+        let currentUser = null;
+        let selectedCategory = 'ALL';
+        let currentRating = 5;
+        let feedbacksCache = [];
+
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        
+        const openPostModalBtn = document.getElementById('openPostModalBtn');
+        const closePostModalBtn = document.getElementById('closePostModalBtn');
+        const cancelPostModalBtn = document.getElementById('cancelPostModalBtn');
+        const postModal = document.getElementById('postModal');
+        const modalAuthNotice = document.getElementById('modalAuthNotice');
+        const modalLoginBtn = document.getElementById('modalLoginBtn');
+        const feedbackForm = document.getElementById('feedbackForm');
+
+        const guideBtn = document.getElementById('guideBtn');
+        const guideModal = document.getElementById('guideModal');
+        const closeGuideModalBtn = document.getElementById('closeGuideModalBtn');
+        const confirmGuideBtn = document.getElementById('confirmGuideBtn');
+
+        const feedbackList = document.getElementById('feedbackList');
+        const emptyMessage = document.getElementById('emptyMessage');
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const starBtns = document.querySelectorAll('.star-btn');
+        const ratingValueText = document.getElementById('ratingValueText');
+
+        // Authentication Listener
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                // User is signed in
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                
+                userAvatar.src = user.photoURL || 'https://placehold.co/100x100/16a34a/ffffff?text=User';
+                userName.textContent = user.displayName || 'お客さま';
+                modalAuthNotice.classList.add('hidden');
+            } else {
+                // User is signed out
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+            }
+        });
+
+        // Google Login Action
+        const handleGoogleLogin = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("ログインに失敗しました: " + error.message);
+            }
+        };
+
+        loginBtn.addEventListener('click', handleGoogleLogin);
+        modalLoginBtn.addEventListener('click', handleGoogleLogin);
+
+        // Logout Action
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
+        });
+
+        // Real-time Firestore Listener
+        const feedbacksCollection = collection(db, 'feedbacks');
+
+        onSnapshot(feedbacksCollection, (snapshot) => {
+            feedbacksCache = [];
+            snapshot.forEach((docSnap) => {
+                feedbacksCache.push({
+                    id: docSnap.id,
+                    ...docSnap.data()
+                });
+            });
+
+            // Client-side Sort (Newest First)
+            feedbacksCache.sort((a, b) => {
+                const timeA = a.createdAt?.seconds || 0;
+                const timeB = b.createdAt?.seconds || 0;
+                return timeB - timeA;
+            });
+
+            renderFeedbacks();
+        }, (error) => {
+            console.error("Firestore Error:", error);
+            feedbackList.innerHTML = `
+                <div class="col-span-full bg-red-50 text-red-700 p-6 rounded-2xl text-center border border-red-200">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i>
+                    <p class="font-bold">データの取得に失敗しました</p>
+                    <p class="text-xs mt-1">Firebaseのセキュリティルールまたは設定をご確認ください。</p>
+                </div>
+            `;
+        });
+
+        // Render Feedbacks UI
+        function renderFeedbacks() {
+            feedbackList.innerHTML = '';
+
+            const filtered = selectedCategory === 'ALL' 
+                ? feedbacksCache 
+                : feedbacksCache.filter(item => item.category === selectedCategory);
+
+            if (filtered.length === 0) {
+                emptyMessage.classList.remove('hidden');
+                return;
+            } else {
+                emptyMessage.classList.add('hidden');
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-5 shadow-sm border border-stone-200 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden";
+
+                // Category Tag Style
+                let tagColor = "bg-stone-100 text-stone-700";
+                if (item.category === '感想・応援') tagColor = "bg-emerald-100 text-emerald-800";
+                if (item.category === '商品リクエスト') tagColor = "bg-amber-100 text-amber-800";
+                if (item.category === '改善要望') tagColor = "bg-blue-100 text-blue-800";
+
+                // Formatted Date
+                const dateObj = item.createdAt ? new Date(item.createdAt.seconds * 1000) : new Date();
+                const dateString = `${dateObj.getFullYear()}/${dateObj.getMonth() + 1}/${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+
+                // Rating Stars HTML
+                const rating = item.rating || 5;
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fa-solid fa-star ${i <= rating ? 'text-amber-400' : 'text-stone-200'} text-xs"></i>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <!-- Header / Category & Date -->
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${tagColor}">
+                                ${item.category || 'その他'}
+                            </span>
+                            <span class="text-[11px] text-stone-400">${dateString}</span>
+                        </div>
+
+                        <!-- Rating Stars -->
+                        <div class="flex items-center space-x-1 mb-2">
+                            ${starsHtml}
+                        </div>
+
+                        <!-- Content -->
+                        <p class="text-sm text-stone-800 leading-relaxed whitespace-pre-line mb-4 font-normal">
+                            ${escapeHTML(item.content)}
+                        </p>
+                    </div>
+
+                    <!-- Footer / User & Like Button -->
+                    <div class="pt-3 border-t border-stone-100 flex justify-between items-center mt-2">
+                        <div class="flex items-center space-x-2">
+                            <img src="${item.isAnonymous ? 'https://placehold.co/100x100/e7e5e4/78716c?text=A' : (item.userPhoto || 'https://placehold.co/100x100/16a34a/ffffff?text=User')}" 
+                                 class="w-6 h-6 rounded-full border border-stone-200 object-cover" alt="icon">
+                            <span class="text-xs font-medium text-stone-600">
+                                ${item.isAnonymous ? '匿名のお客さま' : escapeHTML(item.userName || 'お客さま')}
+                            </span>
+                        </div>
+
+                        <!-- Like Button -->
+                        <button class="like-btn text-xs text-stone-500 hover:text-red-500 flex items-center space-x-1 px-2.5 py-1 rounded-lg hover:bg-red-50 transition-colors" data-id="${item.id}">
+                            <i class="fa-regular fa-heart text-red-400"></i>
+                            <span class="font-bold">${item.likes || 0}</span>
+                        </button>
+                    </div>
+                `;
+
+                feedbackList.appendChild(card);
+            });
+
+            // Bind Like Button Events
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const docId = btn.getAttribute('data-id');
+                    const docRef = doc(db, 'feedbacks', docId);
+                    try {
+                        await updateDoc(docRef, {
+                            likes: increment(1)
+                        });
+                    } catch (err) {
+                        console.error("Like Error:", err);
+                    }
+                });
+            });
+        }
+
+        // Helper to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // Form Submission
+        feedbackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser) {
+                modalAuthNotice.classList.remove('hidden');
+                return;
+            }
+
+            const category = document.getElementById('formCategory').value;
+            const content = document.getElementById('formContent').value.trim();
+            const isAnonymous = document.getElementById('formAnonymous').checked;
+
+            if (!content) return;
+
+            const submitBtn = document.getElementById('submitPostBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>送信中...</span>`;
+
+            try {
+                await addDoc(collection(db, 'feedbacks'), {
+                    category: category,
+                    content: content,
+                    rating: currentRating,
+                    isAnonymous: isAnonymous,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName,
+                    userPhoto: currentUser.photoURL,
+                    likes: 0,
+                    createdAt: serverTimestamp()
+                });
+
+                // Reset Form
+                feedbackForm.reset();
+                currentRating = 5;
+                updateStarDisplay(5);
+                postModal.classList.add('hidden');
+            } catch (error) {
+                console.error("Add Doc Error:", error);
+                alert("投稿の送信に失敗しました: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>送信する</span>`;
+            }
+        });
+
+        // Filter Category Tabs
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => {
+                    t.classList.remove('bg-brand-600', 'text-white', 'font-semibold');
+                    t.classList.add('text-stone-600', 'hover:bg-stone-100', 'font-medium');
+                });
+                tab.classList.add('bg-brand-600', 'text-white', 'font-semibold');
+                tab.classList.remove('text-stone-600', 'hover:bg-stone-100', 'font-medium');
+
+                selectedCategory = tab.getAttribute('data-category');
+                renderFeedbacks();
+            });
+        });
+
+        // Star Rating Interactions
+        starBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentRating = parseInt(btn.getAttribute('data-rating'));
+                updateStarDisplay(currentRating);
+            });
+        });
+
+        function updateStarDisplay(rating) {
+            starBtns.forEach(btn => {
+                const r = parseInt(btn.getAttribute('data-rating'));
+                if (r <= rating) {
+                    btn.classList.add('text-amber-400');
+                    btn.classList.remove('text-stone-200');
+                } else {
+                    btn.classList.remove('text-amber-400');
+                    btn.classList.add('text-stone-200');
+                }
+            });
+            ratingValueText.textContent = rating.toFixed(1);
+        }
+
+        // Modal Controls
+        openPostModalBtn.addEventListener('click', () => {
+            postModal.classList.remove('hidden');
+            if (!currentUser) {
+                modalAuthNotice.classList.remove('hidden');
+            } else {
+                modalAuthNotice.classList.add('hidden');
+            }
+        });
+
+        const closeModal = () => postModal.classList.add('hidden');
+        closePostModalBtn.addEventListener('click', closeModal);
+        cancelPostModalBtn.addEventListener('click', closeModal);
+
+        guideBtn.addEventListener('click', () => guideModal.classList.remove('hidden'));
+        closeGuideModalBtn.addEventListener('click', () => guideModal.classList.add('hidden'));
+        confirmGuideBtn.addEventListener('click', () => guideModal.classList.add('hidden'));
+    </script>
+</body>
+</html>
